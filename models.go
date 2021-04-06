@@ -39,17 +39,14 @@ func (u *User) Save() error {
 	return nil
 }
 
-func (u *User) MarshallJSON() ([]byte, error) {
+func (u User) MarshalJSON() ([]byte, error) {
 	type Alias User
 
+	u.Password = ""
 	return json.Marshal(&struct {
 		*Alias
-		Password *string `json:"password"`
-		Cost     *int    `json:"cost"`
 	}{
-		Password: nil,
-		Cost:     nil,
-		Alias:    (*Alias)(u),
+		Alias: (*Alias)(&u),
 	})
 }
 
