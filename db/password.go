@@ -4,20 +4,22 @@ import (
 	"context"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"guitou.cm/msvc/auth/models"
 )
 
 var pwdCollection = Database().Collection("passwords")
 
-func SaveResetToken(email, token string) error {
+func SaveResetPasswordToken(email, token string) error {
 	now := time.Now()
 	data := models.ResetPassword{
 		primitive.NilObjectID,
 		email,
 		token,
+		now.Add(time.Minute * 10),
 		now,
-		now.Add(time.Hour * time.Duration(10)),
 	}
 
 	_, err := pwdCollection.InsertOne(context.Background(), data)
@@ -26,4 +28,18 @@ func SaveResetToken(email, token string) error {
 	}
 
 	return nil
+}
+
+func DeleteResetPassword(email string) (*models.ResetPassword, error) {
+	var resetPwd models.ResetPassword
+
+	if err := pwdCollection.FindOneAndDelete(context.Background(), bson.M{"email": email}).Decode(&resetPwd); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		} else {
+			return nil, err
+		}
+	}
+
+	return &resetPwd, nil
 }

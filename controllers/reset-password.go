@@ -24,12 +24,14 @@ func ForgetPassword(w http.ResponseWriter, r *http.Request) *AppError {
 		return BadRequestError(err, "No user with that email")
 	}
 
+	db.DeleteResetPassword(forgetPasswordParams.Email)
+
 	token, err := uuid.NewUUID()
 	if err != nil {
 		return InternalError(err, "uuid.NewUUID()")
 	}
 
-	err = db.SaveResetToken(forgetPasswordParams.Email, token.String())
+	err = db.SaveResetPasswordToken(forgetPasswordParams.Email, token.String())
 	if err != nil {
 		return DatabaseError(err, fmt.Sprintf("SaveResetToken : %s - %s", forgetPasswordParams.Email, token))
 	}
