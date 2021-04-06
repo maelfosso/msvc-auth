@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/rs/cors"
+	"guitou.cm/msvc/auth/db"
 )
 
 func loggingMiddleware(next http.Handler) http.Handler {
@@ -24,7 +25,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
-	OpenDB()
+	db.OpenDB()
 
 	r := NewRouter()
 	r.Use(loggingMiddleware)

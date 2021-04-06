@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"guitou.cm/msvc/auth/models"
 )
 
 var _JWTPrivateKey = []byte(os.Getenv("JWT_PRIVATE_KEY"))
@@ -14,10 +15,10 @@ var _JWTPublicKey = []byte(os.Getenv("JWT_PUBLIC_KEY"))
 
 type CustomClaims struct {
 	*jwt.StandardClaims
-	User
+	models.User
 }
 
-func GetJWT(user User) (string, error) {
+func GetJWT(user models.User) (string, error) {
 	signBytes, err := ioutil.ReadFile(string(_JWTPrivateKey))
 	if err != nil {
 		return "", err
