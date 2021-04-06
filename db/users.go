@@ -43,12 +43,27 @@ func FindUserByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-func CheckPassword(hash, password string) (bool, error) {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	log.Println("CheckPassword Into : ", err)
+func UpdateUserPassword(u models.User, password string) error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return false, err
+		return err
 	}
 
-	return true, nil
+	u.Password = string(hash)
+	updateResult, err := usersCollection.UpdateByID(
+		context.Background(),
+		u.ID,
+		bson.M{
+			"$set": bson.M{
+				"password": string(hash),
+			},
+		},
+	)
+	if err != nil {
+		log.Println("Update Error : ", err)
+		return err
+	}
+	log.Println("Update : ", updateResult.ModifiedCount, updateResult.MatchedCount)
+
+	return nil
 }

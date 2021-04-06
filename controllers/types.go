@@ -15,3 +15,15 @@ type SignInResponse struct {
 type ForgetPasswordParams struct {
 	Email string `json:"email"`
 }
+
+type VerifyResetPasswordTokenParams struct {
+	Email string `json:"email"`
+	Token string `json:"token"`
+}
+
+type ResettingPasswordParams struct {
+	Email           string `json:"email"`
+	Token           string `json:"token"`
+	Password        string `json:"password"`
+	ConfirmPassword string `json:"confirmPassword"`
+}

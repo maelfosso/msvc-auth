@@ -66,12 +66,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) *AppError {
 	}
 	log.Println("User Found")
 
-	res, err := db.CheckPassword(user.Password, signInParams.Password)
-	if err != nil {
-		return InternalError(err, "CheckPassword")
-	}
-	log.Println("Checkpassword : ", res)
-
+	res := utils.CheckPassword(user.Password, signInParams.Password)
 	if !res {
 		return BadRequestError(err, "Password don't match")
 	}

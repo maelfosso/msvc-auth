@@ -30,9 +30,8 @@ func NewRouter() *mux.Router {
 	r.Handle("/auth/check", AppHandler(controllers.Check)).Methods(http.MethodPost)
 
 	r.Handle("/auth/password/forgot", AppHandler(controllers.ForgetPassword)).Methods(http.MethodPost)
-	r.HandleFunc("/auth/password/reset", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode("Forgot password")
-	}).Methods(http.MethodPost)
+	r.Handle("/auth/password/forgot/verify", AppHandler(controllers.VerifyResetPasswordToken)).Methods(http.MethodPost)
+	r.Handle("/auth/password/reset", AppHandler(controllers.ResettingPassword)).Methods(http.MethodPost)
 
 	return r
 }

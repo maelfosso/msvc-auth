@@ -43,3 +43,17 @@ func DeleteResetPassword(email string) (*models.ResetPassword, error) {
 
 	return &resetPwd, nil
 }
+
+func FindResetPassword(email, token string) (*models.ResetPassword, error) {
+	var resetPwd models.ResetPassword
+
+	if err := pwdCollection.FindOne(context.Background(), bson.M{"email": email, "token": token}).Decode(&resetPwd); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		} else {
+			return nil, err
+		}
+	}
+
+	return &resetPwd, nil
+}
