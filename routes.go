@@ -102,7 +102,16 @@ func SignIn(w http.ResponseWriter, r *http.Request) *AppError {
 	return nil
 }
 
-func ResetPassword(w http.ResponseWriter, r *http.Request) {
+func Check(w http.ResponseWriter, r *http.Request) *AppError {
+
+	return nil
+}
+
+func ForgetPassword(w http.ResponseWriter, r *http.Request) *AppError {
+
+}
+
+func ResetPassword(w http.ResponseWriter, r *http.Request) *AppError {
 
 }
 
@@ -117,7 +126,11 @@ func NewRouter() *mux.Router {
 
 	r.Handle("/auth/signin", AppHandler(SignIn)).Methods(http.MethodPost)
 	r.Handle("/auth/signup", AppHandler(SignUp)).Methods(http.MethodPost)
-	r.HandleFunc("/auth/reset_password", func(w http.ResponseWriter, r *http.Request) {
+	r.Handle("/auth/check", AppHandler(Check)).Methods(http.MethodPost)
+	r.HandleFunc("/auth/password/forgot", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode("Forgot password")
+	}).Methods(http.MethodPost)
+	r.HandleFunc("/auth/password/reset", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Forgot password")
 	}).Methods(http.MethodPost)
 
