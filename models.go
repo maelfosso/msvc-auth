@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -9,11 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
-
-type SignInParams struct {
-	Email    string `json:"email"`
-	Password string `json:"email"`
-}
 
 type User struct {
 	ID       primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
@@ -43,19 +39,19 @@ func (u *User) Save() error {
 	return nil
 }
 
-// func (u *User) MarshallJSON() ([]byte, error) {
-// 	type Alias User
+func (u *User) MarshallJSON() ([]byte, error) {
+	type Alias User
 
-// 	return json.Marshal(&struct {
-// 		*Alias
-// 		Password *string `json:"password"`
-// 		Cost     *int    `json:"cost"`
-// 	}{
-// 		Password: nil,
-// 		Cost:     nil,
-// 		Alias:    (*Alias)(u),
-// 	})
-// }
+	return json.Marshal(&struct {
+		*Alias
+		Password *string `json:"password"`
+		Cost     *int    `json:"cost"`
+	}{
+		Password: nil,
+		Cost:     nil,
+		Alias:    (*Alias)(u),
+	})
+}
 
 func FindUserByEmail(email string) (*User, error) {
 	var user User
@@ -70,8 +66,9 @@ func FindUserByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
-func CheckPassword(hash, password string, cost int) (bool, error) {
+func CheckPassword(hash, password string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	log.Println("CheckPassword Into : ", err)
 	if err != nil {
 		return false, err
 	}

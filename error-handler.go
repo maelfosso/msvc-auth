@@ -19,7 +19,15 @@ func (fn AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func DecodeBodyDataError(err error) *AppError {
+func InternalError(err error, where string) *AppError {
+	return &AppError{
+		err,
+		"An internal error occurred",
+		http.StatusInternalServerError,
+	}
+}
+
+func DecodingRequestBodyError(err error) *AppError {
 	return &AppError{
 		err,
 		"Impossible to decode request data",
