@@ -70,7 +70,7 @@ func ResettingPassword(w http.ResponseWriter, r *http.Request) *AppError {
 	}
 
 	if params.Password != params.ConfirmPassword {
-		return BadRequestError(fmt.Errorf("Password don't match"), "Password don't match")
+		return BadRequestError(fmt.Errorf("password don't match"), "Password don't match")
 	}
 
 	_, err := db.FindResetPassword(params.Email, params.Token)
