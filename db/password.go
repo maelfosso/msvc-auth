@@ -12,22 +12,23 @@ import (
 
 var pwdCollection = Database().Collection("passwords")
 
-func SaveResetPasswordToken(email, token string) error {
+func SaveResetPasswordToken(email, token string) (*models.ResetPassword, error) {
 	now := time.Now()
 	data := models.ResetPassword{
-		primitive.NilObjectID,
-		email,
-		token,
-		now.Add(time.Minute * 10),
-		now,
+		ID:        primitive.NilObjectID,
+		Email:     email,
+		Token:     token,
+		ExpiredAt: now.Add(time.Minute * 10),
+		CreatedAt: now,
 	}
 
-	_, err := pwdCollection.InsertOne(context.Background(), data)
+	insertResult, err := pwdCollection.InsertOne(context.Background(), data)
 	if err != nil {
-		return err
+		return nil, err
 	}
+	data.ID = insertResult.InsertedID.(primitive.ObjectID)
 
-	return nil
+	return &data, nil
 }
 
 func DeleteResetPassword(email string) (*models.ResetPassword, error) {

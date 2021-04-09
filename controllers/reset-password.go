@@ -3,10 +3,12 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/google/uuid"
 	"guitou.cm/msvc/auth/db"
+	"guitou.cm/msvc/auth/rabbitmq"
 )
 
 func ForgetPassword(w http.ResponseWriter, r *http.Request) *AppError {
@@ -31,9 +33,16 @@ func ForgetPassword(w http.ResponseWriter, r *http.Request) *AppError {
 		return InternalError(err, "uuid.NewUUID()")
 	}
 
-	err = db.SaveResetPasswordToken(forgetPasswordParams.Email, token.String())
+	data, err := db.SaveResetPasswordToken(forgetPasswordParams.Email, token.String())
 	if err != nil {
 		return DatabaseError(err, fmt.Sprintf("SaveResetToken : %s - %s", forgetPasswordParams.Email, token))
+	}
+
+	if b, err := json.Marshal(data); err == nil {
+		log.Println("Marshelling before Publishing : %v", b)
+		rabbitmq.Publish(b, "auth.password.forget")
+	} else {
+		log.Println("[rset-password] Error occurred when marshelling data")
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -90,6 +99,15 @@ func ResettingPassword(w http.ResponseWriter, r *http.Request) *AppError {
 	err = db.UpdateUserPassword(*user, params.Password)
 	if err != nil {
 		return DatabaseError(err, "Error when updating the password")
+	}
+
+	// Delete the token document
+
+	if b, err := json.Marshal(user); err == nil {
+		log.Println("Marshelling before Publishing : %v", b)
+		rabbitmq.Publish(b, "auth.password.reset")
+	} else {
+		log.Println("[rset-password] Error occurred when marshelling data")
 	}
 
 	return nil

@@ -9,9 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var ctx context.Context
-var client *mongo.Client
-var database *mongo.Database
+var (
+	ctx      context.Context
+	client   *mongo.Client
+	database *mongo.Database
+)
 
 func OpenDB() {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)

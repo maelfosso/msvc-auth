@@ -7,6 +7,7 @@ import (
 
 	"github.com/rs/cors"
 	"guitou.cm/msvc/auth/db"
+	"guitou.cm/msvc/auth/rabbitmq"
 )
 
 func loggingMiddleware(next http.Handler) http.Handler {
@@ -26,6 +27,10 @@ func loggingMiddleware(next http.Handler) http.Handler {
 
 func main() {
 	db.OpenDB()
+	defer db.CloseDB()
+
+	rabbitmq.Connect()
+	defer rabbitmq.Close()
 
 	r := NewRouter()
 	r.Use(loggingMiddleware)
